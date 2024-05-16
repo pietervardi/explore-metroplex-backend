@@ -6,3 +6,16 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Tour {
+  id          String   @id @default(cuid())
+  name        String
+  city        String
+  price       Int
+  description String
+  address     String
+  map         String
+  photo       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+}
