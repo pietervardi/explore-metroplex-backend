@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const UserRoute = require('./routes/UserRoutes');
 const TourRoute = require('./routes/TourRoutes');
 
 const app = express();
@@ -16,6 +17,7 @@ app.get('/', (req, res) => {
   res.send('Welcome to Explore Metroplex API!');
 });
 
+app.use(UserRoute);
 app.use(TourRoute);
 
 app.listen(PORT, () => {

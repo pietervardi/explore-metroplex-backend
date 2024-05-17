@@ -2,7 +2,10 @@ const prisma = require('../db');
 
 const getAllTour = async (req, res) => {
   try {
-    const tours = await prisma.tour.findMany();
+    const { city } = req.query;
+    const queryOptions = city ? { where: { city } } : {};
+    const tours = await prisma.tour.findMany(queryOptions);
+
     res.status(200).json({
       status: 'success',
       message: 'tours retrieved',
@@ -63,6 +66,16 @@ const createTour = async (req, res) => {
         address,
         map,
         photo,
+      },
+      select: {
+        id: true,
+        name: true,
+        city: true, 
+        price: true, 
+        description: true,
+        address: true,
+        map: true,
+        photo: true,
       }
     });
 
@@ -90,13 +103,13 @@ const updateTour = async (req, res) => {
       photo,
     } = req.body;
 
-    const tourExist = await prisma.tour.findUnique({
+    const isTourExist = await prisma.tour.findUnique({
       where: {
         id: req.params.id
       }
     });
 
-    if (!tourExist) {
+    if (!isTourExist) {
       return res.status(404).json({
         status: 'fail',
         message: 'tour not found'
@@ -115,6 +128,16 @@ const updateTour = async (req, res) => {
         address,
         map,
         photo,
+      },
+      select: {
+        id: true,
+        name: true,
+        city: true, 
+        price: true, 
+        description: true,
+        address: true,
+        map: true,
+        photo: true,
       }
     });
 
@@ -132,13 +155,13 @@ const updateTour = async (req, res) => {
 
 const deleteTour = async (req, res) => {
   try {
-    const tourExist = await prisma.tour.findUnique({
+    const isTourExist = await prisma.tour.findUnique({
       where: {
         id: req.params.id
       }
     });
 
-    if (!tourExist) {
+    if (!isTourExist) {
       return res.status(404).json({
         status: 'fail',
         message: 'tour not found'
