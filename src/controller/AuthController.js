@@ -1,6 +1,6 @@
-const prisma = require('../db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const prisma = require('../db');
 const generateAccessToken = require('../utils/generateAccessToken');
 
 const register = async (req, res) => {
@@ -102,6 +102,7 @@ const login = async (req, res) => {
       name: user.name,
       username: user.username,
       email: user.email,
+      role: user.role
     }
 
     const accessToken = generateAccessToken(payload);
@@ -125,7 +126,7 @@ const login = async (req, res) => {
       status: 'success',
       message: 'login success',
       data: {
-        accessToken
+        token: accessToken
       }
     });
   } catch (error) {
@@ -147,6 +148,7 @@ const getOwnProfile = async (req, res) => {
         username: true,
         email: true,
         profilePicture: true,
+        role: true
       },
     });
 

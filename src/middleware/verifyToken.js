@@ -9,6 +9,7 @@ const verifyToken = (req, res, next) => {
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
       if (err) return res.sendStatus(403);
       req.userData = decoded;
+      next();
     });
   } catch (error) {
     return res.status(401).json({
@@ -16,7 +17,6 @@ const verifyToken = (req, res, next) => {
       message: error.message
     });
   }
-  next();
 }
 
 module.exports = verifyToken;

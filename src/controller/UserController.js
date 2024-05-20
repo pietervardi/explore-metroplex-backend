@@ -9,6 +9,7 @@ const getAllUser = async (req, res) => {
         username: true,
         email: true,
         profilePicture: true,
+        role: true,
       }
     });
 
@@ -27,8 +28,9 @@ const getAllUser = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const currentUserId = req.userData.id;
+    const isAdmin = req.userData.role === 'ADMIN';
 
-    if (currentUserId !== req.params.id) {
+    if (!isAdmin && currentUserId !== req.params.id) {
       return res.status(401).json({
         status: 'fail',
         message: 'unauthorized to update user'
@@ -40,6 +42,7 @@ const updateUser = async (req, res) => {
       username,
       email,
       profilePicture,
+      role,
     } = req.body;
 
     const isUserExist = await prisma.user.findUnique({
@@ -85,6 +88,13 @@ const updateUser = async (req, res) => {
       }
     }
 
+    if (!isAdmin && role) {
+      return res.status(401).json({
+        status: 'fail',
+        message: 'unauthorized to update user role'
+      });
+    }
+
     const user = await prisma.user.update({
       where: {
         id: req.params.id
@@ -94,6 +104,7 @@ const updateUser = async (req, res) => {
         username,
         email,
         profilePicture,
+        ...(isAdmin && { role }),
       },
       select: {
         id: true,
@@ -101,6 +112,7 @@ const updateUser = async (req, res) => {
         username: true,
         email: true,
         profilePicture: true,
+        role: true,
       }
     });
 
@@ -119,8 +131,9 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   try {
     const currentUserId = req.userData.id;
+    const isAdmin = req.userData.role === 'ADMIN';
 
-    if (currentUserId !== req.params.id) {
+    if (!isAdmin && currentUserId !== req.params.id) {
       return res.status(401).json({
         status: 'fail',
         message: 'unauthorized to delete user'

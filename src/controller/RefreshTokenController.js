@@ -1,5 +1,5 @@
-const prisma = require('../db');
 const jwt = require('jsonwebtoken');
+const prisma = require('../db');
 
 const refreshToken = async (req, res) => {
   try {
@@ -18,10 +18,11 @@ const refreshToken = async (req, res) => {
       if (err || user.id !== decoded.id) return res.sendStatus(403);
 
       const payload = {
-        id: decoded.id,
-        name: decoded.name,
-        username: decoded.username,
-        email: decoded.email,
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        role: user.role
       }
 
       const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
@@ -30,7 +31,7 @@ const refreshToken = async (req, res) => {
         status: 'success',
         message: 'access token refreshed',
         data: {
-          accessToken
+          token: accessToken
         }
       });
     });
