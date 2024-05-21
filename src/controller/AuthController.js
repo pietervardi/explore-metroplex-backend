@@ -149,13 +149,13 @@ const getOwnProfile = async (req, res) => {
         email: true,
         profilePicture: true,
         role: true
-      },
+      }
     });
 
     if (!user) {
       return res.status(404).json({
         status: 'fail',
-        message: 'User not found',
+        message: 'user not found',
       });
     }
 
@@ -165,6 +165,53 @@ const getOwnProfile = async (req, res) => {
       data: {
         user,
       },
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+const updatePassword = async (req, res) => {
+  try {
+    const userId = req.userData.id;
+    const { currentPassword, newPassword } = req.body;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        status: 'fail',
+        message: 'user not found',
+      });
+    }
+
+    const isCurrentPasswordMatch = await bcrypt.compare(currentPassword, user.password);
+
+    if (!isCurrentPasswordMatch) {
+      return res.status(401).json({
+        status: 'fail',
+        message: 'current password is incorrect',
+      });
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        password: hashedNewPassword,
+      },
+    });
+
+    res.status(200).json({
+      status: 'success',
+      message: 'password updated',
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -206,4 +253,4 @@ const logout = async (req, res) => {
   }
 }
 
-module.exports = { register, login, getOwnProfile, logout };
+module.exports = { register, login, getOwnProfile, updatePassword, logout };
