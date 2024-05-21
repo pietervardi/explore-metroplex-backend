@@ -6,6 +6,7 @@ const AuthRoutes = require('./routes/AuthRoutes');
 const UserRoutes = require('./routes/UserRoutes');
 const TourRoutes = require('./routes/TourRoutes');
 const RefreshTokenRoutes = require('./routes/RefreshTokenRoutes');
+const ReservationRoutes = require('./routes/ReservationRoutes');
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use(AuthRoutes);
 app.use(UserRoutes);
 app.use(TourRoutes);
 app.use(RefreshTokenRoutes);
+app.use(ReservationRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

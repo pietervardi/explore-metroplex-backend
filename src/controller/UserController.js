@@ -11,6 +11,9 @@ const getAllUser = async (req, res) => {
         email: true,
         profilePicture: true,
         role: true,
+      },
+      orderBy: {
+        createdAt: 'asc',
       }
     });
 

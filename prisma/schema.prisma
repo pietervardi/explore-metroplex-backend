@@ -18,6 +18,8 @@ model User {
   refreshToken   String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+
+  reservedTours Reservation[]
 }
 
 enum UserRole {
@@ -36,4 +38,32 @@ model Tour {
   photo       String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  reservations Reservation[]
+}
+
+model Reservation {
+  id         String            @id @default(uuid())
+  name       String
+  phone      String
+  email      String
+  ticket     Int
+  subtotal   Int
+  reservedAt DateTime
+  status     ReservationStatus @default(BOOKED)
+  createdAt  DateTime          @default(now())
+  userId     String
+  tourId     String
+
+  user User @relation(fields: [userId], references: [id])
+  tour Tour @relation(fields: [tourId], references: [id])
+
+  @@index([userId])
+  @@index([tourId])
+}
+
+enum ReservationStatus {
+  BOOKED
+  DONE
+  CANCELED
 }

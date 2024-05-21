@@ -3,7 +3,18 @@ const prisma = require('../db');
 const getAllTour = async (req, res) => {
   try {
     const { city } = req.query;
-    const queryOptions = city ? { where: { city } } : {};
+    const queryOptions = city ? {
+      where: {
+        city 
+      },
+      orderBy: {
+        createdAt: 'asc',
+      }
+    } : {
+      orderBy: {
+        createdAt: 'asc',
+      }
+    };
     const tours = await prisma.tour.findMany(queryOptions);
 
     res.status(200).json({
