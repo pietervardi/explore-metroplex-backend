@@ -1,3 +1,4 @@
+const validator = require('validator');
 const prisma = require('../db');
 
 const getAllUser = async (req, res) => {
@@ -74,6 +75,13 @@ const updateUser = async (req, res) => {
     }
     
     if (email) {
+      if (!validator.isEmail(email)) {
+        return res.status(400).json({
+          status: 'fail',
+          message: 'invalid email format'
+        });
+      }
+
       const isEmailExist = await prisma.user.findUnique({
         where: {
           email

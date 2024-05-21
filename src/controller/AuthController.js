@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const validator = require('validator');
 const prisma = require('../db');
 const generateAccessToken = require('../utils/generateAccessToken');
 
@@ -11,6 +12,13 @@ const register = async (req, res) => {
       email,
       password,
     } = req.body;
+
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'invalid email format'
+      });
+    }
 
     const isUsernameExist = await prisma.user.findUnique({
       where: {
