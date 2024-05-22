@@ -34,6 +34,26 @@ const getTourById = async (req, res) => {
     const detailTour = await prisma.tour.findUnique({
       where: {
         id: req.params.id
+      },
+      include: {
+        feedbacks: {
+          select: {
+            id: true,
+            text: true,
+            rate: true,
+            createdAt: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+                email: true,
+                profilePicture: true,
+                role: true,
+              }
+            }
+          }
+        },
       }
     });
 
