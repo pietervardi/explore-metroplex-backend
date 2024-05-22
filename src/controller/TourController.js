@@ -2,20 +2,24 @@ const prisma = require('../db');
 
 const getAllTour = async (req, res) => {
   try {
-    const { city } = req.query;
-    const queryOptions = city ? {
-      where: {
-        city 
-      },
-      orderBy: {
-        createdAt: 'asc',
-      }
-    } : {
+    const { city, page = 1, limit = 10 } = req.query;
+
+    const offset = (page - 1) * limit
+
+    const query = {
+      skip: offset,
+      take: parseInt(limit),
+      where: {},
       orderBy: {
         createdAt: 'asc',
       }
     };
-    const tours = await prisma.tour.findMany(queryOptions);
+
+    if (city) {
+      query.where.city = city;
+    }
+    
+    const tours = await prisma.tour.findMany(query);
 
     res.status(200).json({
       status: 'success',
