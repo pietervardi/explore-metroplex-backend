@@ -1,4 +1,8 @@
+const crypto = require('crypto');
 const prisma = require('../db');
+const { getObjectSignedUrl, uploadImage, deleteImage } = require('../services/S3');
+
+const generateImageName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex');
 
 const getAllTour = async (req, res) => {
   try {
@@ -20,6 +24,10 @@ const getAllTour = async (req, res) => {
     }
     
     const tours = await prisma.tour.findMany(query);
+
+    for (let tour of tours) {
+      tour.photo = await getObjectSignedUrl(tour.photo)
+    }
 
     res.status(200).json({
       status: 'success',
@@ -68,6 +76,8 @@ const getTourById = async (req, res) => {
       });
     }
 
+    detailTour.photo = await getObjectSignedUrl(detailTour.photo)
+
     res.status(200).json({
       status: 'success',
       message: 'tour retrieved',
@@ -89,8 +99,11 @@ const createTour = async (req, res) => {
       description,
       address,
       map,
-      photo,
     } = req.body;
+
+    const imageName = `tours/${generateImageName()}-${req.file.originalname}`;
+    const imageBuffer = req.file.buffer;
+    const mimeType = req.file.mimetype;
 
     const tour = await prisma.tour.create({
       data: {
@@ -100,7 +113,7 @@ const createTour = async (req, res) => {
         description,
         address,
         map,
-        photo,
+        photo: imageName,
       },
       select: {
         id: true,
@@ -110,9 +123,10 @@ const createTour = async (req, res) => {
         description: true,
         address: true,
         map: true,
-        photo: true,
       }
     });
+
+    await uploadImage(imageName, imageBuffer, mimeType);
 
     res.status(201).json({
       status: 'success',
@@ -135,7 +149,6 @@ const updateTour = async (req, res) => {
       description,
       address,
       map,
-      photo,
     } = req.body;
 
     const isTourExist = await prisma.tour.findUnique({
@@ -151,6 +164,17 @@ const updateTour = async (req, res) => {
       });
     }
 
+    let imageName;
+    if (req.file) {
+      await deleteImage(isTourExist.photo);
+
+      imageName = `tours/${generateImageName()}-${req.file.originalname}`;
+      const imageBuffer = req.file.buffer;
+      const mimeType = req.file.mimetype;
+
+      await uploadImage(imageName, imageBuffer, mimeType);
+    }
+
     const tour = await prisma.tour.update({
       where: {
         id: req.params.id
@@ -162,7 +186,7 @@ const updateTour = async (req, res) => {
         description,
         address,
         map,
-        photo,
+        ...(imageName && { photo: imageName }),
       },
       select: {
         id: true,
@@ -172,7 +196,6 @@ const updateTour = async (req, res) => {
         description: true,
         address: true,
         map: true,
-        photo: true,
       }
     });
 
@@ -203,11 +226,13 @@ const deleteTour = async (req, res) => {
       });
     }
 
-    await prisma.tour.delete({
+    const tour = await prisma.tour.delete({
       where: {
         id: req.params.id
       }
     });
+
+    await deleteImage(tour.photo)
     
     res.status(200).json({
       status: 'success',

@@ -45,7 +45,6 @@ const updateUser = async (req, res) => {
       name,
       username,
       email,
-      profilePicture,
       role,
     } = req.body;
 
@@ -114,7 +113,6 @@ const updateUser = async (req, res) => {
         name,
         username,
         email,
-        profilePicture,
         ...(isAdmin && { role }),
       },
       select: {
