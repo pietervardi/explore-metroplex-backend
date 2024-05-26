@@ -1,5 +1,5 @@
 const express = require('express');
-const refreshToken = require('../controller/refreshTokenController');
+const refreshToken = require('../controller/RefreshTokenController');
 
 const router = express.Router();
 
