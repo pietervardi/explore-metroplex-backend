@@ -6,13 +6,13 @@ const createReservation = async (req, res) => {
     const userId = req.userData.id;
     const tourId = req.params.id;
 
-    const isTourExist = await prisma.tour.findUnique({
+    const tour = await prisma.tour.findUnique({
       where: {
         id: tourId
       }
     });
 
-    if (!isTourExist) {
+    if (!tour) {
       return res.status(409).json({
         status: 'fail',
         message: 'tour not exist'
@@ -35,6 +35,45 @@ const createReservation = async (req, res) => {
       });
     }
 
+    const reservedDate = new Date(reservedAt);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (reservedDate < today) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'cannot make a reservation for a past date'
+      });
+    }
+
+    reservedDate.setHours(0, 0, 0, 0);
+    const nextDay = new Date(reservedDate);
+    nextDay.setDate(reservedDate.getDate() + 1);
+
+    const totalTicketsReserved = await prisma.reservation.aggregate({
+      _sum: {
+        ticket: true
+      },
+      where: {
+        tourId: tourId,
+        reservedAt: {
+          gte: reservedDate,
+          lt: nextDay
+        },
+        status: {
+          not: 'CANCELED'
+        }
+      }
+    });
+
+    const ticketsAlreadyReserved = totalTicketsReserved._sum.ticket || 0;
+    if (ticketsAlreadyReserved + ticket > tour.capacity) {
+      return res.status(409).json({
+        status: 'fail',
+        message: 'reservation exceeds tour capacity for the selected date'
+      });
+    }
+
     await prisma.reservation.create({
       data: {
         name,
@@ -42,10 +81,21 @@ const createReservation = async (req, res) => {
         email,
         ticket,
         subtotal,
-        reservedAt: new Date(reservedAt),
+        reservedAt: reservedDate,
         userId,
         tourId,
       },
+    });
+
+    await prisma.tour.update({
+      where: {
+        id: tourId
+      },
+      data: {
+        visitor: {
+          increment: ticket
+        }
+      }
     });
 
     res.status(201).json({
@@ -59,11 +109,17 @@ const createReservation = async (req, res) => {
 
 const getReservations = async (req, res) => {
   try {
+    const { status } = req.query;
     const currentUserId = req.userData.id;
     const isAdmin = req.userData.role === 'ADMIN';
 
+    const whereClause = isAdmin ? {} : { userId: currentUserId };
+    if (status) {
+      whereClause.status = status.toUpperCase();
+    }
+
     const reservations = await prisma.reservation.findMany({
-      where: isAdmin ? {} : { userId: currentUserId },
+      where: whereClause,
       select: {
         id: true,
         name: true,

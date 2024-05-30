@@ -33,6 +33,8 @@ model Tour {
   name        String
   city        String
   price       Int
+  capacity    Int
+  visitor     Int      @default(0)
   description String
   address     String
   map         String
