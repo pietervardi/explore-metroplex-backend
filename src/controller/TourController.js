@@ -110,8 +110,8 @@ const createTour = async (req, res) => {
       data: {
         name,
         city, 
-        price, 
-        capacity,
+        price: parseInt(price), 
+        capacity: parseInt(capacity),
         description,
         address,
         map,
@@ -180,18 +180,23 @@ const updateTour = async (req, res) => {
       await uploadImage(imageName, imageBuffer, mimeType);
     }
 
+    const data = {
+      name,
+      city, 
+      description,
+      address,
+      map,
+    };
+
+    if (price) data.price = parseInt(price);
+    if (capacity) data.capacity = parseInt(capacity);
+
     const tour = await prisma.tour.update({
       where: {
         id: req.params.id
       },
       data: {
-        name,
-        city, 
-        price,
-        capacity,
-        description,
-        address,
-        map,
+        ...data,
         ...(imageName && { photo: imageName }),
       },
       select: {
