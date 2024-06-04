@@ -105,6 +105,12 @@ const updateUser = async (req, res) => {
       });
     }
 
+    let updatedProfilePicture = isUserExist.profilePicture;
+    if (name && name !== isUserExist.name) {
+      const encodedName = encodeURIComponent(name);
+      updatedProfilePicture = `https://ui-avatars.com/api/?name=${encodedName}&background=random`;
+    }
+
     const user = await prisma.user.update({
       where: {
         id: req.params.id
@@ -113,6 +119,7 @@ const updateUser = async (req, res) => {
         name,
         username,
         email,
+        profilePicture: updatedProfilePicture,
         ...(isAdmin && { role }),
       },
       select: {

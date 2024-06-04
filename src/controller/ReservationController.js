@@ -192,20 +192,20 @@ const cancelReservation = async (req, res) => {
     const currentUserId = req.userData.id;
     const isAdmin = req.userData.role === 'ADMIN';
 
-    const isTourExist = await prisma.reservation.findUnique({
+    const tour = await prisma.reservation.findUnique({
       where: {
         id: reservationId
       }
     });
 
-    if (!isTourExist) {
+    if (!tour) {
       return res.status(409).json({
         status: 'fail',
         message: 'reservation not exist'
       }); 
     }
 
-    if (!isAdmin && isTourExist.userId !== currentUserId) {
+    if (!isAdmin && tour.userId !== currentUserId) {
       return res.status(403).json({
         status: 'fail',
         message: 'unauthorized to cancel this reservation',
@@ -219,6 +219,17 @@ const cancelReservation = async (req, res) => {
       data: {
         status: 'CANCELED'
       },
+    });
+
+    await prisma.tour.update({
+      where: {
+        id: tour.tourId
+      },
+      data: {
+        visitor: {
+          decrement: tour.ticket
+        }
+      }
     });
 
     res.status(200).json({
