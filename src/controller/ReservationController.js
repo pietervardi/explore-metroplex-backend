@@ -1,5 +1,6 @@
 const validator = require('validator');
 const prisma = require('../db');
+const { getObjectSignedUrl } = require('../services/S3');
 
 const createReservation = async (req, res) => {
   try {
@@ -79,8 +80,8 @@ const createReservation = async (req, res) => {
         name,
         phone,
         email,
-        ticket,
-        subtotal,
+        ticket: parseInt(ticket),
+        subtotal: parseInt(subtotal),
         reservedAt: reservedDate,
         userId,
         tourId,
@@ -93,7 +94,7 @@ const createReservation = async (req, res) => {
       },
       data: {
         visitor: {
-          increment: ticket
+          increment: parseInt(ticket)
         }
       }
     });
@@ -156,6 +157,10 @@ const getReservations = async (req, res) => {
         createdAt: 'asc',
       }
     });
+
+    for (let reservation of reservations) {
+      reservation.tour.photo = await getObjectSignedUrl(reservation.tour.photo)
+    }
 
     const now = new Date();
     const updatedReservations = await Promise.all(

@@ -114,7 +114,7 @@ const login = async (req, res) => {
     }
 
     const accessToken = generateAccessToken(payload);
-    const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '1d' })
+    const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '30d' })
 
     await prisma.user.update({
       where: {

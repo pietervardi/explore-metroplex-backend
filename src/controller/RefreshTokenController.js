@@ -25,7 +25,7 @@ const refreshToken = async (req, res) => {
         role: user.role
       }
 
-      const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+      const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '7d' });
 
       res.status(200).json({
         status: 'success',
