@@ -3,7 +3,35 @@ const prisma = require('../db');
 
 const getAllUser = async (req, res) => {
   try {
+    const { query } = req.query;
+
+    const whereClause = {};
+
+    if (query) {
+      whereClause.OR = [
+        {
+          name: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
+        {
+          username: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
+        {
+          email: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
+      ];
+    }
+
     const users = await prisma.user.findMany({
+      where: whereClause,
       select: {
         id: true,
         name: true,

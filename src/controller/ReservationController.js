@@ -110,17 +110,27 @@ const createReservation = async (req, res) => {
 
 const getReservations = async (req, res) => {
   try {
-    const { status } = req.query;
+    const { status, query } = req.query;
     const currentUserId = req.userData.id;
     const isAdmin = req.userData.role === 'ADMIN';
 
     const whereClause = isAdmin ? {} : { userId: currentUserId };
-    if (status) {
-      whereClause.status = status.toUpperCase();
-    }
+
+    if (status) whereClause.status = status.toUpperCase();
 
     const reservations = await prisma.reservation.findMany({
-      where: whereClause,
+      where: {
+        ...whereClause,
+        ...(query && {
+          OR: [
+            { name: { contains: query, mode: "insensitive" } },
+            { phone: { contains: query, mode: "insensitive" } },
+            { email: { contains: query, mode: "insensitive" } },
+            { user: { name: { contains: query, mode: "insensitive" } } },
+            { tour: { name: { contains: query, mode: "insensitive" } } }
+          ],
+        }),
+      },
       select: {
         id: true,
         name: true,
@@ -167,12 +177,8 @@ const getReservations = async (req, res) => {
       reservations.map(async (reservation) => {
         if (reservation.status === 'BOOKED' && new Date(reservation.reservedAt) < now) {
           return prisma.reservation.update({
-            where: {
-              id: reservation.id
-            },
-            data: {
-              status: 'DONE'
-            }
+            where: { id: reservation.id },
+            data: { status: 'DONE' }
           });
         }
         return reservation;
@@ -182,9 +188,7 @@ const getReservations = async (req, res) => {
     res.status(200).json({
       status: 'success',
       message: 'reservation retrieved',
-      data: {
-        reservations: updatedReservations
-      }
+      data: { reservations: updatedReservations }
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -6,9 +6,9 @@ const generateImageName = (bytes = 32) => crypto.randomBytes(bytes).toString('he
 
 const getAllTour = async (req, res) => {
   try {
-    const { city, page = 1, limit = 10 } = req.query;
+    const { name, city, page = 1, limit = 10 } = req.query;
 
-    const offset = (page - 1) * limit
+    const offset = (page - 1) * limit;
 
     const query = {
       skip: offset,
@@ -16,17 +16,47 @@ const getAllTour = async (req, res) => {
       where: {},
       orderBy: {
         createdAt: 'asc',
+      },
+      include: {
+        feedbacks: {
+          select: {
+            id: true,
+            text: true,
+            rate: true,
+            createdAt: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+                email: true,
+                profilePicture: true,
+                role: true,
+              }
+            }
+          }
+        }
       }
     };
 
+    if (name) {
+      query.where.name = {
+        contains: name,
+        mode: 'insensitive',
+      };
+    }
+
     if (city) {
-      query.where.city = city;
+      query.where.city = {
+        contains: city,
+        mode: 'insensitive',
+      };
     }
     
     const tours = await prisma.tour.findMany(query);
 
     for (let tour of tours) {
-      tour.photo = await getObjectSignedUrl(tour.photo)
+      tour.photo = await getObjectSignedUrl(tour.photo);
     }
 
     res.status(200).json({
