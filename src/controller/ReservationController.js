@@ -68,10 +68,14 @@ const createReservation = async (req, res) => {
     });
 
     const ticketsAlreadyReserved = totalTicketsReserved._sum.ticket || 0;
-    if (ticketsAlreadyReserved + ticket > tour.capacity) {
+    const availableTickets = tour.capacity - ticketsAlreadyReserved;
+
+    if (ticket > availableTickets) {
       return res.status(409).json({
         status: 'fail',
-        message: 'reservation exceeds tour capacity for the selected date'
+        message: availableTickets > 0 ? 
+          `only ${availableTickets} tickets are available for the selected date` : 
+          'the selected date is fully booked'
       });
     }
 
@@ -164,7 +168,7 @@ const getReservations = async (req, res) => {
         },
       },
       orderBy: {
-        createdAt: 'asc',
+        reservedAt: 'asc',
       }
     });
 
