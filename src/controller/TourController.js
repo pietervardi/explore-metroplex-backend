@@ -15,7 +15,7 @@ const getAllTour = async (req, res) => {
       take: parseInt(limit),
       where: {},
       orderBy: {
-        createdAt: 'asc',
+        rating: 'desc',
       },
       include: {
         feedbacks: {
