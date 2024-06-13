@@ -6,7 +6,7 @@ const generateImageName = (bytes = 32) => crypto.randomBytes(bytes).toString('he
 
 const getAllTour = async (req, res) => {
   try {
-    const { name, city, page = 1, limit = 10 } = req.query;
+    const { name, city, page = 1, limit = 100 } = req.query;
 
     const offset = (page - 1) * limit;
 
