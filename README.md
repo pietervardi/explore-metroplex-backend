@@ -37,7 +37,7 @@ To run the project locally, please follow the steps below.
   npm install
   ```
 
-- #### Create and setup `.env` file in the root folder with same text in `.env.development` file 
+- #### Create and setup `.env` file in the root folder with same text in `.env.example` file 
 
 - #### Push Database Schema to Local Database
   ```bash 
