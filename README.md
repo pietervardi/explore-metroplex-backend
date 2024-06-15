@@ -1,5 +1,15 @@
 # Explore Metroplex API
 
+## What I'm use here?
+
+- [Express Js](https://expressjs.com/) as Framework.
+- [Supabase](https://supabase.com/) as Database.
+
+## Deployed Links
+
+- [Front-End]()
+- [Back-End](https://explore-metroplex-backend.onrender.com)
+
 ## Configuration
 
 To run the project locally, please follow the steps below.
