@@ -52,7 +52,7 @@ To run the project locally, please follow the steps below.
 ## API Specification
 
 ### Base URL
-The base URL for all endpoints is:
+The base URL for all endpoints is: `https://explore-metroplex-backend.onrender.com`
 
 ### Register
 
