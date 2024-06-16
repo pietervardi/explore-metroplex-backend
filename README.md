@@ -1,5 +1,15 @@
 # Explore Metroplex API
 
+## What I'm use here?
+
+- [Express Js](https://expressjs.com/) as Framework.
+- [Supabase](https://supabase.com/) as Database.
+
+## Deployed Links
+
+- [Front-End]()
+- [Back-End](https://explore-metroplex-backend.onrender.com)
+
 ## Configuration
 
 To run the project locally, please follow the steps below.
@@ -27,7 +37,7 @@ To run the project locally, please follow the steps below.
   npm install
   ```
 
-- #### Create and setup `.env` file in the root folder with same text in `.env.development` file 
+- #### Create and setup `.env` file in the root folder with same text in `.env.example` file 
 
 - #### Push Database Schema to Local Database
   ```bash 
@@ -42,7 +52,7 @@ To run the project locally, please follow the steps below.
 ## API Specification
 
 ### Base URL
-The base URL for all endpoints is:
+The base URL for all endpoints is: `https://explore-metroplex-backend.onrender.com`
 
 ### Register
 
