@@ -14,7 +14,8 @@ const app = express();
 dotenv.config();
 
 app.use(cors({
-  origin: true,
+  origin: 'https://explore-metroplex.vercel.app',
+  methods: 'GET,POST,PUT,DELETE',
   credentials: true
 }));
 app.use(express.json());
