@@ -7,7 +7,7 @@
 
 ## Deployed Links
 
-- [Front-End]()
+- [Front-End](https://explore-metroplex.vercel.app)
 - [Back-End](https://explore-metroplex-backend.onrender.com)
 
 ## Configuration
